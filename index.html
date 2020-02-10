@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body, div, ul, li {
+            margin: 0;
+            padding: 0;
+        }
+        ul, li {
+            list-style: none;
+            color: #666;
+        }
+        body {
+            background-color: #000;
+        }
+
+        .wrapper .common {
+            width: 800px;
+            height: 800px;
+            position: absolute;
+            left: 500px;
+            top: 500px;
+            transform-origin: left 11px;
+            transition: all 0.3s;
+        }
+        .common li span {
+            display: inline-block;
+            width: 100px;
+        }
+        .common li {
+            position: absolute;
+            left: 0;
+            top: 0;
+            transform-origin: left center;
+        }
+        .common .active {
+            color: #fff;
+            font-weight: 900;
+        }
+        .common .active span {
+            transition: color 0.3s;
+        }
+
+
+        .second li span {
+            margin-left: 300px;
+        }
+        .minute li span {
+            margin-left: 225px;
+        }
+        .hour li span {
+            margin-left: 165px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <ul class="second common"></ul>
+        <ul class="minute common"></ul>
+        <ul class="hour common"></ul>
+    </div>
+
+    <script>
+        // 阿拉伯数字 - 中文 对照表
+        let DATA_MAP = {
+            0: '零',
+            1: '一',
+            2: '二',
+            3: '三',
+            4: '四',
+            5: '五',
+            6: '六',
+            7: '七',
+            8: '八',
+            9: '九',
+        }
+        for (let i = 10; i <= 59; i ++) {
+            let first = Math.floor(i / 10);
+            let last = i % 10;
+            first = first > 1 ? DATA_MAP[first] : '';
+            last = last === 0 ? '' : DATA_MAP[last];
+            DATA_MAP[i] = first + '十' + last;
+        }
+
+        let second = document.querySelector('.second');
+        let minute = document.querySelector('.minute');
+        let hour = document.querySelector('.hour');
+
+        // 秒
+        for (let i = 0; i <= 59; i ++) {
+            let li = document.createElement('li');
+            let deg = parseInt(6 * i);
+            li.innerHTML = '<span>' + DATA_MAP[i] + '秒</span>';
+            li.style.transform = 'rotate(' + deg + 'deg)';
+            second.appendChild(li);
+        }
+
+        // 分
+        for (let i = 0; i <= 59; i ++) {
+            let li = document.createElement('li');
+            let deg = parseInt(6 * i);
+            li.innerHTML = '<span>' + DATA_MAP[i] + '分</span>';
+            li.style.transform = 'rotate(' + deg + 'deg)';
+            minute.appendChild(li);
+        }
+
+        // 时
+        for (let i = 1; i <= 12; i ++) {
+            let li = document.createElement('li');
+            let deg = parseInt(30 * i);
+            li.innerHTML = '<span>' + DATA_MAP[i] + '点</span>';
+            li.style.transform = 'rotate(' + deg + 'deg)';
+            hour.appendChild(li);
+        }
+
+
+        // 获取时间
+        let date = new Date();
+        let secondStart = 0 - (date.getSeconds() * 6);
+        let secondCount = date.getSeconds();
+        let minStart = 0 - (date.getMinutes() * 6);
+        let minCount = date.getMinutes();
+        let hourStart = 0 - (date.getHours() * 30);
+        let hourCount = date.getHours();
+        hourCount = hourCount > 12 ? hourCount - 13 : hourCount;
+        console.log(hourCount);
+
+        // 初始化时间位置
+        minute.style.transform = 'rotate(' + minStart + 'deg)';
+        second.style.transform = 'rotate(' + secondStart + 'deg)';
+        hour.style.transform = 'rotate(' + hourStart + 'deg)';
+        minute.children[minCount].className = 'active';
+        second.children[secondCount].className = 'active';
+        hour.children[hourCount - 1].className = 'active';
+
+        // 开始转动
+        setInterval(function () {
+            secondStart -= 6;
+            secondCount ++;
+            if (secondCount >= 60) {
+                minStart -= 6;
+                minCount ++;
+                minute.style.transform = 'rotate(' + minStart + 'deg)';
+                minute.children[minCount].className = 'active';
+                let minLast = minCount - 1 < 0 ? 59 : minCount - 1;
+                minute.children[minLast].className = '';
+                secondCount = 0;
+            }
+            second.style.transform = 'rotate(' + secondStart + 'deg)';
+            second.children[secondCount].className = 'active';
+            let last = secondCount - 1 < 0 ? 59 : secondCount - 1;
+            second.children[last].className = '';
+        }, 1000);
+    </script>
+</body>
+</html>
